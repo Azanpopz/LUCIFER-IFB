@@ -7,7 +7,6 @@ from gtts import gTTS
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from config import HNDLR
 
 
 def convert(text):
