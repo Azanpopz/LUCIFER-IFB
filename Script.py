@@ -139,3 +139,7 @@ Translate texts to a specific language!
 <b>Commands and Usage:</b>
 • /tr [language code][reply] - translate replied message to specific language. """
     
+    CAPTION_TEXT = """𝐏𝐎𝐖𝐄𝐑𝐄𝐃 𝐁𝐘 ➧ 𝙐𝙁𝙎 𝘽𝙤𝙩𝙯
+━═━═━═━═━═━═━═━═
+⟱⟱⟱⟱⟱⟱⟱ 𝕁𝕠𝕚𝕟 ⟱⟱⟱⟱⟱⟱⟱
+━═━ @nasrani_update ━═━"""
