@@ -1,27 +1,27 @@
+
 import os
 import logging
 import random
 import asyncio
 from Script import script
 from pyrogram import Client, filters
+from database.batch_db import get_batch
 from pyrogram.errors.exceptions.bad_request_400 import ChatAdminRequired
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database.ia_filterdb import Media, get_file_details, unpack_new_file_id
 from database.users_chats_db import db
-from info import CHANNELS, ADMINS, AUTH_CHANNEL, CUSTOM_FILE_CAPTION, LOG_CHANNEL, PICS
+from info import CHANNELS, ADMINS, AUTH_CHANNEL, CUSTOM_FILE_CAPTION, LOG_CHANNEL, STC
 from utils import get_size, is_subscribed, temp
 import re
 logger = logging.getLogger(__name__)
 
+
 @Client.on_message(filters.command("start"))
 async def start(client, message):
     if message.chat.type in ['group', 'supergroup']:
-        buttons = [
+        buttons = [            
             [
-                InlineKeyboardButton('🤖 Updates', url='https://t.me/TeamEvamaria')
-            ],
-            [
-                InlineKeyboardButton('ℹ️ Help', url=f"https://t.me/{temp.U_NAME}?start=help"),
+                InlineKeyboardButton('🕵️MENU🕵️', url=f"https://t.me/{temp.U_NAME}?start=menu"),
             ]
             ]
         reply_markup = InlineKeyboardMarkup(buttons)
@@ -36,21 +36,15 @@ async def start(client, message):
         await db.add_user(message.from_user.id, message.from_user.first_name)
         await client.send_message(LOG_CHANNEL, script.LOG_TEXT_P.format(message.from_user.id, message.from_user.mention))
     if len(message.command) != 2:
-        buttons = [[
-            InlineKeyboardButton('➕ Add Me To Your Groups ➕', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
-            ],[
-            InlineKeyboardButton('🔍 Search', switch_inline_query_current_chat=''),
-            InlineKeyboardButton('🤖 Updates', url='https://t.me/EvaMariaUpdates')
-            ],[
-            InlineKeyboardButton('ℹ️ Help', callback_data='help'),
-            InlineKeyboardButton('😊 About', callback_data='about')
+        buttons = [[            
+            InlineKeyboardButton('🕵️Munu🕵️', callback_data='menu'),
+            InlineKeyboardButton('😊𝐀𝐛𝐨𝐮𝐭😊', callback_data='about')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-        await message.reply_photo(
-            photo=random.choice(PICS),
-            caption=script.START_TXT.format(message.from_user.mention, temp.U_NAME, temp.B_NAME),
+        await message.reply_sticker(
+            sticker=random.choice(STC),
             reply_markup=reply_markup,
-            parse_mode='html'
+            
         )
         return
     if AUTH_CHANNEL and not await is_subscribed(client, message):
@@ -62,13 +56,13 @@ async def start(client, message):
         btn = [
             [
                 InlineKeyboardButton(
-                    "🤖 Join Updates Channel", url=invite_link.invite_link
+                    "📩𝐉𝐨𝐢𝐧 𝐔𝐩𝐝𝐚𝐭𝐞𝐬 𝐂𝐡𝐚𝐧𝐧𝐞𝐥📩", url=invite_link.invite_link
                 )
             ]
         ]
 
         if message.command[1] != "subscribe":
-            btn.append([InlineKeyboardButton(" 🔄 Try Again", callback_data=f"checksub#{message.command[1]}")])
+            btn.append([InlineKeyboardButton("📥𝐓𝐫𝐲 𝐀𝐠𝐚𝐢𝐧📥", callback_data=f"checksub#{message.command[1]}")])
         await client.send_message(
             chat_id=message.from_user.id,
             text="**Please Join My Updates Channel to use this Bot!**",
@@ -77,24 +71,55 @@ async def start(client, message):
             )
         return
     if len(message.command) ==2 and message.command[1] in ["subscribe", "error", "okay", "help"]:
-        buttons = [[
-            InlineKeyboardButton('➕ Add Me To Your Groups ➕', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
-            ],[
-            InlineKeyboardButton('🔍 Search', switch_inline_query_current_chat=''),
-            InlineKeyboardButton('🤖 Updates', url='https://t.me/EvaMariaUpdates')
-            ],[
-            InlineKeyboardButton('ℹ️ Help', callback_data='help'),
-            InlineKeyboardButton('😊 About', callback_data='about')
+        buttons = [[            
+            InlineKeyboardButton('🕵️𝐇𝐞𝐥𝐩🕵️', callback_data='help'),
+            InlineKeyboardButton('😊𝐀𝐛𝐨𝐮𝐭😊', callback_data='about')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-        await message.reply_photo(
-            photo=random.choice(PICS),
-            caption=script.START_TXT.format(message.from_user.mention, temp.U_NAME, temp.B_NAME),
+        await message.reply_sticker(
+            sticker=random.choice(STC),
             reply_markup=reply_markup,
-            parse_mode='html'
+            
         )
         return
     file_id = message.command[1]
+    print(file_id)
+    unique_id, f_id, file_ref, caption = await get_batch("Eva-V3", file_id)
+
+    if unique_id:
+        temp_msg = await message.reply("Please wait...")
+        file_args = f_id.split("#")
+        cap_args = caption.split("#")
+        i = 0
+        await asyncio.sleep(2)
+        await temp_msg.delete()
+        for b_file in file_args:
+            f_caption = cap_args[i]
+            if f_caption is None:
+                f_caption = ""
+            f_caption = f_caption + f"\n\n<code>┈•••✿</code> @UniversalFilmStudio <code>✿•••┈</code>"
+            i += 1
+            try:
+                await client.send_cached_media(
+                    chat_id=message.from_user.id,
+                    file_id=b_file,
+                    caption=f_caption,
+                    parse_mode="html",
+                    reply_markup=InlineKeyboardMarkup(
+                        [
+                            [
+                                InlineKeyboardButton(
+                                    '🎭 ⭕️ ᴄᴏɴᴛᴀᴄᴛ ᴍᴇ ⭕️', url="https://t.me/UFSChatBot"
+                                )
+                            ]
+                        ]
+                    )
+                )
+            except Exception as err:
+                return await message.reply(f"{str(err)}")
+            await asyncio.sleep(1)
+        return await message.reply(f"<b><a href='https://t.me/UniversalFilmStudio'>Thank For Using Me...</a></b>")
+
     files_ = await get_file_details(file_id)
     if not files_:
         return await message.reply('No such file exist.')
@@ -107,15 +132,47 @@ async def start(client, message):
             f_caption=CUSTOM_FILE_CAPTION.format(file_name=title, file_size=size, file_caption=f_caption)
         except Exception as e:
             logger.exception(e)
+            f_caption=files.caption
+    if CUSTOM_FILE_CAPTION:
+        try:
+            f_caption=CUSTOM_FILE_CAPTION.format(file_name=title, file_size=size, file_caption=f_caption)
+        except Exception as e:
+            logger.exception(e)
             f_caption=f_caption
     if f_caption is None:
         f_caption = f"{files.file_name}"
+    buttons = [
+                    [
+                        InlineKeyboardButton('💌 SUBSCRIBE ✅', url=f"https://t.me/{temp.U_NAME}?start={file_id}")
+                    ],
+                    [
+                        InlineKeyboardButton('💌 SUBSCRIBE ✅', url='https://t.me/bigmoviesworld'),
+                        InlineKeyboardButton('💌 SUBSCRIBE ✅', url='https://t.me/bigmoviesworld')
+                    ],
+                    [
+                        InlineKeyboardButton('💌 SUBSCRIBE ✅', url='https://t.me/bigmoviesworld'),
+                        InlineKeyboardButton('💌 SUBSCRIBE ✅', url='https://t.me/bigmoviesworld')
+                  
+                    ]
+                    ]
     await client.send_cached_media(
         chat_id=message.from_user.id,
         file_id=file_id,
         caption=f_caption,
+        reply_markup=InlineKeyboardMarkup(buttons),
+        parse_mode="markdown"
         )
-                    
+       
+        
+        
+
+            
+
+
+
+
+
+
 
 @Client.on_message(filters.command('channel') & filters.user(ADMINS))
 async def channel_info(bot, message):
@@ -231,4 +288,3 @@ async def delete_all_index_confirm(bot, message):
     await Media.collection.drop()
     await message.answer()
     await message.message.edit('Succesfully Deleted All The Indexed Files.')
-
