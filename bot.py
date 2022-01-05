@@ -1,6 +1,12 @@
+from os import environ
+
+from pyrogram import Client, filters
+
+
 import logging
 import logging.config
 
+import pyromod.listen
 # Get logging configurations
 logging.config.fileConfig('logging.conf')
 logging.getLogger().setLevel(logging.INFO)
@@ -13,6 +19,12 @@ from database.ia_filterdb import Media
 from database.users_chats_db import db
 from info import SESSION, API_ID, API_HASH, BOT_TOKEN, LOG_STR
 from utils import temp
+
+API_ID = environ.get('API_ID')
+API_HASH = environ.get('API_HASH')
+BOT_TOKEN = environ.get('BOT_TOKEN')
+API_KEY = environ.get('API_KEY')
+
 
 class Bot(Client):
 
@@ -44,7 +56,3 @@ class Bot(Client):
     async def stop(self, *args):
         await super().stop()
         logging.info("Bot stopped. Bye.")
-
-
-app = Bot()
-app.run()
